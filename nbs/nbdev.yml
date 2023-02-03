@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "redditdumps"
+  site-url: "https://wuqui.github.io/redditdumps"
+  description: "Downloading and parsing the Pushshift Reddit comment dumps."
+  repo-branch: main
+  repo-url: "https://github.com/wuqui/redditdumps"
