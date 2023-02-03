@@ -5,4 +5,4 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://wuqui.github.io',
                 'git_url': 'https://github.com/wuqui/redditdumps',
                 'lib_path': 'redditdumps'},
-  'syms': {'redditdumps.core': {'redditdumps.core.foo': ('core.html#foo', 'redditdumps/core.py')}}}
+  'syms': {'redditdumps.core': {'redditdumps.core.add_one': ('core.html#add_one', 'redditdumps/core.py')}}}
