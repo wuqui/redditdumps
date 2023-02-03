@@ -16,7 +16,7 @@ def get_docs(
     ) -> list:
     dir_comments = Path(dir_comments)
     df = pl.read_parquet(dir_comments / subreddit / '*.parquet')
-    docs_srs = df['body'].sample(1_000).str.split(' ')
+    docs_srs = df['body'].str.split(' ')
     docs_list = docs_srs.to_list()
     return docs_list
     
@@ -30,7 +30,7 @@ def train_model(
     ):
     docs = get_docs(dir_comments, subreddit)
     model = Word2Vec(
-        docs[:1_000_000],
+        docs,
         workers=8
     )
     dir_models = Path(dir_models)
