@@ -16,18 +16,22 @@ def get_docs(
     ) -> list:
     dir_comments = Path(dir_comments)
     df = pl.read_parquet(dir_comments / subreddit / '*.parquet')
+    df = df.sample(1000)
     docs_srs = df['body'].str.split(' ')
     docs_list = docs_srs.to_list()
     return docs_list
     
 
-# %% ../nbs/00_core.ipynb 5
+# %% ../nbs/00_core.ipynb 6
 @call_parse
 def train_model(
-    subreddit: str,
-    dir_comments: str,
-    dir_models: str
-    ):
+    subreddit: str, # Subreddit to be processed
+    dir_comments: str, # Directory containing parquet dataframes
+    dir_models: str # Directory to save model
+    ) -> Word2Vec:
+    """
+    Trains a word2vec model on the comments of a subreddit.
+    """
     docs = get_docs(dir_comments, subreddit)
     model = Word2Vec(
         docs,
@@ -35,8 +39,9 @@ def train_model(
     )
     dir_models = Path(dir_models)
     model.save((dir_models / f"{subreddit}.model").as_posix())
+    return model
 
-# %% ../nbs/00_core.ipynb 7
+# %% ../nbs/00_core.ipynb 9
 @call_parse
 def add_one(
     num: int # first number
