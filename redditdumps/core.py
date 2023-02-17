@@ -13,22 +13,16 @@ import pandas as pd
 
 # %% ../nbs/00_core.ipynb 3
 def get_docs(
-    dir_comments: str, # directory containing parquet dataframes
-    subreddit: str # subreddit to be processed
-    ) -> list:
-    dir_comments = Path(dir_comments)
-    df = pl.read_parquet(dir_comments / subreddit / '*.parquet')
-    print('finished reading parquet files')
-    df = df.sample(10_000)
-    docs_srs = df['body'].str.split(' ')
-    print('finished tokenizing')
-    docs_list = docs_srs.to_list()
-    print('finished converting to list')
-    # return docs_list
-    return docs_srs
-    
+	dir_comments: str,  # directory containing parquet dataframes
+	) -> pd.Series:
+	fpaths = list(Path(dir_comments).glob('*.parquet'))
+	df = pd.read_parquet(fpaths, columns=['body'])
+	print('finished reading parquet files')
+	docs = df['body'].str.split()
+	print('finished tokenizing')
+	return docs
 
-# %% ../nbs/00_core.ipynb 13
+# %% ../nbs/00_core.ipynb 6
 class Corpus:
     """An iterator that yields sentences (lists of str)."""
     def __init__(self, docs):
@@ -38,7 +32,7 @@ class Corpus:
         for doc in self.docs_clean:
             yield doc
 
-# %% ../nbs/00_core.ipynb 15
+# %% ../nbs/00_core.ipynb 7
 class MyCallback(gensim.models.callbacks.CallbackAny2Vec):
     # Initialize any variables or attributes here
     def __init__(self):
@@ -74,10 +68,10 @@ class MyCallback(gensim.models.callbacks.CallbackAny2Vec):
         logging.info(f"Batch processed {percentage_sentences:.2f}% sentences and {percentage_words:.2f}% words")
         logging.info(f"Batch used {percentage_effective_words:.2f}% words effectively for training")
 
-# %% ../nbs/00_core.ipynb 16
+# %% ../nbs/00_core.ipynb 8
 import logging
 
-# %% ../nbs/00_core.ipynb 18
+# %% ../nbs/00_core.ipynb 10
 @call_parse
 def train_model(
     subreddit: str, # Subreddit to be processed
@@ -87,12 +81,12 @@ def train_model(
     """
     Trains a word2vec model on the comments of a subreddit.
     """
-    docs = get_docs(dir_comments, subreddit)
-    corpus = Corpus(docs)
+    docs = get_docs(dir_comments)
+    # corpus = Corpus(docs)
     my_callback = MyCallback()
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     model = Word2Vec(
-        corpus,
+        docs,
         workers=8,
         callbacks=[my_callback],
         min_count=5,
@@ -105,7 +99,7 @@ def train_model(
     model.save((dir_models / f"{subreddit}.model").as_posix())
     return model
 
-# %% ../nbs/00_core.ipynb 21
+# %% ../nbs/00_core.ipynb 13
 @call_parse
 def add_one(
     num: int # first number
