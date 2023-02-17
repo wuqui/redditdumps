@@ -90,7 +90,6 @@ def train_model(docs):
 # %% ../nbs/00_core.ipynb 9
 @call_parse
 def train_model_pipe(
-    subreddit: str,  # Subreddit to be processed
     dir_comments: str,  # Directory containing parquet dataframes
     max_docs: int = None,  # Maximum number of parquet files to be processed
     fp_model_out: str = None  # Save model to this file path
