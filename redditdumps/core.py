@@ -72,13 +72,17 @@ class Word2VecLogger(gensim.models.callbacks.CallbackAny2Vec):
         logging.info(f"Batch used {percentage_effective_words:.2f}% words effectively for training")
 
 # %% ../nbs/00_core.ipynb 8
-def train_model(docs):
+def train_model(
+    docs,  # corpus of tokenized documents
+    min_count: int = 5,  # ignore words with frequency lower than this
+    ) -> pd.Series:
     logger = Word2VecLogger()
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    logging.basicConfig(
+        format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     model = Word2Vec(
         docs,
         workers=8,
-        min_count=5,
+        min_count=min_count,
         window=5,
         epochs=5,
         vector_size=300,
@@ -87,19 +91,21 @@ def train_model(docs):
     )
     return model
 
+
 # %% ../nbs/00_core.ipynb 9
 @call_parse
 def train_model_pipe(
     dir_comments: str,  # Directory containing parquet dataframes
     max_docs: int = None,  # Maximum number of parquet files to be processed
-    fp_model_out: str = None  # Save model to this file path
+    fp_model_out: str = None, # Save model to this file path
+    min_count: int = 5,  # ignore words with frequency lower than this
     ) -> Word2Vec:
     """
     Trains a word2vec model on the comments of a subreddit.
     """
     docs = get_docs(dir_comments, max_docs)
     corpus = Corpus(docs)
-    model = train_model(corpus)
+    model = train_model(corpus, min_count=min_count)
     if fp_model_out:
         model.save(fp_model_out)
     return model
